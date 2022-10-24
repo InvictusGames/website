@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+</head>
+<body>
+<div th:fragment="forums">
+
+    <div class="table-container table-responsive">
+        <table class="table">
+            <colgroup>
+                <col>
+                <col width="15%">
+                <col width="25%">
+                <col width="14%">
+                <col width="16%">
+                <col>
+                <col>
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Status</th>
+                <th style="text-align: center">Rank</th>
+                <th>Reason</th>
+                <th>Added By</th>
+                <th>Added At</th>
+                <th>Duration</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr th:each="grant : ${profileGrants}">
+                <td>
+                    <span th:class="'badge bg-' + ${grant.isActive() ? 'success' : 'danger'}" th:text="${grant.getStatus()}"></span>
+                </td>
+                <td style="text-align: center">
+                    <span class="badge" th:style="'background-color: ' + ${grant.webColor}" th:text="${grant.getDisplayName()}"></span>
+                </td>
+                <td th:text="${grant.grantedReason}"></td>
+                <td>
+                    <a th:href="'/profile/' + ${grant.grantedBy}" class="link" th:text="${grant.grantedBy}"></a>
+                </td>
+                <td th:text="${grant.getAddedAt()}"></td>
+                <td th:text="${grant.getExpiresAt()}"></td>
+                <td>
+                    <a th:if="${grant.isActive()}" th:href="'#modal-' + ${grant.id}" class="btn btn-danger btn-sm btn-sq" data-bs-toggle="modal">
+                        <i class="fa fa-trash fa-fw"></i>
+                    </a>
+                    <a th:if="${!grant.isActive()}" href="#modal-grantCannotRemove" class="btn btn-danger btn-sm btn-sq" data-bs-toggle="modal">
+                        <i class="fa fa-trash fa-fw"></i>
+                    </a>
+                </td>
+
+                <div class="modal fade" th:id="'modal-' + ${grant.id}">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                Remove Grant
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body" style="padding: 0 1.25rem 0rem 1.25rem">
+                                Are you sure want to remove this grant?
+                            </div>
+
+                            <form class="form-remove-grant" th:action="@{'/grant/remove/' + ${profile.name} + '/' + ${grant.id}}" method="post">
+                                <div class="form-group" style="padding: 0 1.25rem 1.25rem">
+                                    <label for="reason" class="form-label">Reason</label>
+                                    <input type="text" class="form-control" name="reason" id="reason" th:placeholder="${grant.getDisplayName()}" required>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Confirm</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <br>
+
+    <a class="change-page" th:if="${previousPage == currentPage}" href="#">&#8249;</a>
+    <a class="change-page" th:href="'/profile/' + ${profile.name} + '/grants?page=' + ${previousPage}" th:if="${previousPage != currentPage}" href="#">&#8249;</a>
+
+    <a class="change-page" th:if="${nextPage == currentPage}" href="#">&#8250;</a>
+    <a class="change-page" th:href="'/profile/' + ${profile.name} + '/grants?page=' + ${nextPage}" th:if="${nextPage != currentPage}" href="#">&#8250;</a>
+
+    <a href="#modal-grantAdd" class="btn btn-primary"  style="position: sticky; left: 55%;" data-bs-toggle="modal">Add Grant</a>
+
+    <div class="modal fade" id="modal-grantAdd">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Add Grant
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form class="form-add-grant" th:action="@{'/grant/add/' + ${profile.name}}" method="post">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="grantPlayer" class="form-label">Player</label>
+                            <input type="text" class="form-control" id="grantPlayer" name="grantPlayer" th:value="${profile.name}" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="grantRank" class="form-label">Rank</label>
+                            <select class="form-control" id="grantRank" name="grantRank">
+                                <option th:each="rank : ${ranks}" th:style="'color: ' + ${rank.webColor}" th:text="${rank.getDisplayName()}" th:value="${rank.uuid}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="grantReason" class="form-label">Reason</label>
+                            <input type="text" class="form-control" id="grantReason" name="grantReason" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="grantDuration" class="form-label">Duration</label>
+                            <div class="input-group">
+                                <input type="number"  class="form-control" id="grantDuration" name="grantDuration" required>
+                                <select class="form-control" id="grantDurationType" name="grantDurationType">
+                                    <option value="days">Days</option>
+                                    <option value="hours">Hours</option>
+                                    <option value="minutes">Minutes</option>
+                                    <option value="forever">Forever</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-grantCannotRemove">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Cannot Remove Grant
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    This grant cannot be removed.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+</html>

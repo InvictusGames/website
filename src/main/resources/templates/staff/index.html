@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{default}">
+<head>
+    <title>Staff</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="card card-rank" th:each="rank : ${staff}">
+        <div class="card-header" th:style="'--color: ' + ${rank.webColor} + '; text-align: center;'" th:text="${rank.getDisplayName()}">
+        </div>
+        <div class="card-body">
+            <div class="rank-players">
+
+                <div th:each="member : ${rank.members}">
+                    <a th:href="'/profile/' + ${member.name}" class="rank-players-item">
+                        <div class="rank-players-icon">
+                            <img th:src="'https://visage.surgeplay.com/bust/' + ${member.uuid}" th:alt="${member.name}">
+                        </div>
+                        <div class="rank-players-content" th:style="'color: ' + ${rank.webColor}" th:text="${member.name}">
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

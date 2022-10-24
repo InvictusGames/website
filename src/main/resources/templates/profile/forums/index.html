@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+</head>
+<body>
+<div th:fragment="forums">
+    <div class="card">
+        <div class="card-body">
+
+            <div class="alert alert-danger" style="padding: 3px;text-align: center;margin-top: 10px;" th:if="${profileThreads.size() <= 0}">
+                This user does not have any threads.
+            </div>
+
+            <div class="list" th:if="${profileThreads.size() >= 1}">
+                <div class="list-item" th:each="thread : ${profileThreads}">
+                    <div class="list-item-content">
+                        <a th:href="'/forum/' + ${thread.getFormattedForum()} + '/' + ${thread.id}" th:text="${thread.title}"></a>
+                        <div class="meta">
+                            <span th:text="${thread.getPostedAgo()}"></span>
+                            <span> in </span>
+                            <a class="link" th:href="${'/forum/' + thread.getFormattedForum()}" th:text="${thread.forumName}"></a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <a class="change-page" th:if="${previousPage == currentPage}" href="#">&#8249;</a>
+    <a class="change-page" th:href="'/profile/' + ${profile.name} + '/forums?page=' + ${previousPage}"
+       th:if="${previousPage != currentPage}" href="#">&#8249;</a>
+
+    <a class="change-page" th:if="${nextPage == currentPage}" href="#">&#8250;</a>
+    <a class="change-page" th:href="'/profile/' + ${profile.name} + '/forums?page=' + ${nextPage}"
+       th:if="${nextPage != currentPage}" href="#">&#8250;</a>
+</div>
+</body>
+</html>

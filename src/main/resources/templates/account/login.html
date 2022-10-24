@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{default}">
+<head>
+    <title>Account</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="row justify-content-center" th:if="${errorMessage != null}">
+        <div class="col-lg-5">
+            <div class="alert alert-danger" style="padding: 0.5rem 1rem; text-align: center;">
+                <p th:text="${errorMessage}"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center" th:if="${successMessage != null}">
+        <div class="col-lg-5">
+            <div class="alert alert-success" style="padding: 0.5rem 1rem; text-align: center;">
+                <p th:text="${successMessage}"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-5">
+            <div class="card card-secondary">
+                <div class="card-header">
+                    Login
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/login}" method="post">
+                        <div class="form-group">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password">
+                        </div>
+                        <input type="hidden" name="csrfmiddlewaretoken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-block">Login</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

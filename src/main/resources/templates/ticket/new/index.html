@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="@{default}"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <title>New Ticket</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                New Ticket
+            </div>
+            <div class="card-body">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <form th:action="@{/ticket/new}" method="post">
+                            <div class="form-group">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-control" id="category" name="category">
+                                    <option th:each="category : ${categories}" th:value="${category.name()}" th:text="${category.getDisplayName()}"></option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="content" class="form-label">Content</label>
+                                <textarea class="form-control" id="content" name="content" rows="6"></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

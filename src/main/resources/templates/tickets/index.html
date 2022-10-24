@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="@{default}"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Tickets</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+
+        <div class="toolbar">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="/">
+                        <i class="fa fa-home"></i>
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" th:if="${#httpServletRequest.requestURI != '/tickets/admin'}">
+                    Tickets
+                </li>
+                <li class="breadcrumb-item" th:if="${#httpServletRequest.requestURI == '/tickets/admin'}">
+                    <a href="/tickets">Tickets</a>
+                </li>
+                <li class="breadcrumb-item active" th:if="${#httpServletRequest.requestURI == '/tickets/admin'}">
+                    Admin
+                </li>
+            </ol>
+            <div class="toolbar-buttons" th:if="${#httpServletRequest.requestURI == '/tickets'}">
+                <a href="/tickets/admin" class="btn btn-danger" th:if="${sessionProfile.hasPermission('website.ticket.viewall')}">Admin</a>
+                <a href="/ticket/new" class="btn btn-primary" th:if="${!sessionProfile.hasGrantOf('ticket-ban')}">New Ticket</a>
+            </div>
+        </div>
+
+        <div class="alert alert-danger" th:if="${sessionProfile.hasGrantOf('ticket-ban')}">
+            You are banned from creating support tickets.
+        </div>
+
+        <div class="table-container table-responsive">
+            <table class="table">
+                <colgroup>
+                    <col width="15%">
+                    <col width="50%">
+                    <col width="20%">
+                    <col width="20%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th style="text-align: center">Status</th>
+                    <th>Ticket</th>
+                    <th class="text-center">Replies</th>
+                    <th>Last Reply</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr th:each="ticket : ${tickets}">
+                    <td style="text-align: center">
+                        <span class="badge badge-success ticket-status"
+                              th:style="'background-color: ' + ${ticket.status.getWebColor()}"
+                              th:text="${ticket.status.getDisplayName()}"></span>
+                    </td>
+                    <td>
+                        <a th:href="'/ticket/' + ${ticket.id}">
+                            <strong th:text="${ticket.category.getDisplayName()} + ' #' + ${ticket.id}"></strong>
+                        </a>
+                        <div class="meta">
+                            <span>By </span>
+                            <a th:text="${ticket.authorName}" th:style="'color: ' + ${ticket.authorWebColor}" th:href="'/profile/' + ${ticket.authorName}"></a>
+                            <span>, </span>
+                            <span th:text="${ticket.getPostedAgo()}"></span>
+                        </div>
+                    </td>
+                    <td class="text-center" th:text="${ticket.replies.size()}">
+                    </td>
+                    <td th:if="${ticket.getLastReply() != null}">
+                        By <a th:href="'/profile/' + ${ticket.getLastReply().getAuthorName()}"
+                              th:style="'color: ' + ${ticket.getLastReply().getAuthorWebColor()}"
+                              th:text="${ticket.getLastReply().getAuthorName()}"></a>
+                        <div class="meta" th:text="${ticket.getLastReply().getPostedAgo()}">
+                        </div>
+                    </td>
+                    <td th:if="${ticket.getLastReply() == null}">
+                        <div class="meta" th:text="'Never'">
+                        </div>
+                    </td>
+                </tr>
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="@{default}"
+>
+<head>
+    <title>Thread</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+
+        <div class="toolbar">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="/">
+                        <i class="fa fa-home"></i>
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="/forums">
+                        Forums
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a th:href="'/forum/' + ${thread.getFormattedForum()}"
+                       th:text="${thread.forumName}">
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" th:text="'Thread #' + ${thread.id}">
+                </li>
+            </ol>
+            <div class="toolbar-buttons"
+                 th:if="${sessionProfile != null && sessionProfile.uuid == thread.author && !sessionProfile.hasPermission('website.thread.edit.*')}">
+                <div class="dropdown">
+                    <a href="#" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">Options</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a th:href="'/forum/thread/edit/' + ${thread.id}" class="dropdown-item"
+                               th:if="${!sessionProfile.hasGrantOf('post-ban')}">Edit</a>
+                        </li>
+                        <li>
+                            <a href="#modal-delete" class="dropdown-item" data-bs-toggle="modal">Delete</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="toolbar-buttons"
+                 th:if="${sessionProfile != null && sessionProfile.hasPermission('website.thread.edit.*')}">
+                <div class="dropdown">
+                    <a href="#" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown">Admin Options</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a th:href="'/forum/thread/edit/' + ${thread.id}" class="dropdown-item"
+                               th:if="${sessionProfile != null && !sessionProfile.hasGrantOf('post-ban')}">Edit</a>
+                        </li>
+                        <li>
+                            <a href="#modal-delete" class="dropdown-item" data-bs-toggle="modal">Delete</a>
+                        </li>
+                        <li>
+                            <form th:action="@{/forum/thread/pin}" method="post">
+                                <input type="hidden" name="threadId" th:value="${thread.id}">
+                                <input type="hidden" name="forumName" th:value="${thread.forumName}">
+                                <button type="submit" class="dropdown-item"
+                                        th:text="${thread.pinned ? 'Unpin' : 'Pin'} + ' Thread'"
+                                        th:if="${sessionProfile.hasPermission('website.thread.pin')}"></button>
+                            </form>
+                        </li>
+                        <li>
+                            <form th:action="@{/forum/thread/lock}" method="post">
+                                <input type="hidden" name="threadId" th:value="${thread.id}">
+                                <input type="hidden" name="forumName" th:value="${thread.forumName}">
+                                <button type="submit" class="dropdown-item"
+                                        th:text="${thread.locked ? 'Unlock' : 'Lock'} + ' Thread'"
+                                        th:if="${sessionProfile.hasPermission('website.thread.lock')}"></button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-thread">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 d-none d-md-block">
+                        <div class="text-end">
+                            <img th:src="'https://visage.surgeplay.com/full/' + ${thread.author}"
+                                 th:alt="${thread.authorName}" style="width: 125px;">
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="card-header">
+                            <span th:text="${thread.title}"></span>
+                            <div class="meta">
+                                By <a th:href="'/profile/' + ${thread.authorName}" th:text="${thread.authorName}"
+                                      th:style="'color: ' + ${thread.authorWebColor}"></a>,
+                                <span th:text="${thread.getPostedAgo()}"></span>
+                            </div>
+                            <div class="meta" th:if="${thread.lastEditedAt != -1}">
+                                Last edited,
+                                <span th:text="${thread.getLastEditedAgo()}"></span>
+                            </div>
+                        </div>
+                        <div class="content" th:utext="${thread.getContent()}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                Replies
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger"
+                     th:if="${sessionProfile != null && sessionProfile.hasGrantOf('post-ban')}">
+                    You are banned from posting replies.
+                </div>
+
+                <div class="alert alert-danger"
+                     th:if="${sessionProfile != null && thread.locked && !sessionProfile.hasGrantOf('post-ban')}">
+                    This thread is no longer open for replies.
+                </div>
+
+                <div class="message"
+                     th:if="${sessionProfile != null && !sessionProfile.hasGrantOf('post-ban') && (!thread.locked || sessionProfile.hasPermission('website.thread.lock'))}">
+                    <div class="message-icon">
+                        <img th:src="'https://visage.surgeplay.com/face/' + ${sessionProfile.uuid}"
+                             th:alt="${sessionProfile.name}">
+                    </div>
+                    <div class="message-content">
+                        <form th:action="@{/forum/thread/reply}" method="post">
+                            <div class="input-group">
+                                <input type="hidden" id="threadId" name="threadId" th:value="${thread.id}">
+                                <input type="hidden" id="forumId" name="forumId" th:value="${thread.forum}">
+
+                                <input type="text" id="content" name="content" class="form-control"
+                                       style="border-radius: 5px 0px 0px 5px" placeholder="Type your reply here...">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-share"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="message" th:if="${sessionProfile == null}">
+                    <div>
+                        <a>Please </a>
+                        <a th:href="${'/login?redirect=forum/' + thread.getFormattedForum() + '/' + thread.id}"
+                           class="link">login</a>
+                        <a>to reply to this thread.</a>
+                    </div>
+                </div>
+
+                <div class="message" th:each="reply : ${thread.replies}">
+                    <div class="message-icon">
+                        <img th:src="'https://visage.surgeplay.com/face/' + ${reply.author}"
+                             th:alt="${reply.authorName}">
+                    </div>
+                    <div class="message-content">
+                        <div class="content" th:text="${reply.body}">
+                        </div>
+                        <div class="meta">
+                            <a th:href="'/profile/' + ${reply.authorName}" th:text="${reply.authorName}"
+                               th:style="'color: ' + ${reply.authorWebColor}"></a>,
+                            <span th:text="${reply.getPostedAgo()}"></span>
+                        </div>
+                        <div class="meta" th:if="${sessionProfile != null}">
+                            <a class="thread-reply-action">reply</a>
+                            <a class="thread-reply-action" th:if="${reply.canDelete(sessionProfile)}"
+                               th:href="'#modal-delete-' + ${reply.id}" data-bs-toggle="modal">delete</a>
+                            <a class="thread-reply-action" th:if="${reply.author == sessionProfile.uuid}">edit</a>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" th:id="'modal-delete-' + ${reply.id}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    Delete Reply
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body" style="padding: 0 1.25rem 1.25rem 1.25rem">
+                                    Are you sure want to delete this reply?
+                                </div>
+
+                                <form class="form-remove-grant" th:action="@{/forum/reply/delete}" method="post">
+                                    <input type="hidden" name="replyId" th:value="${reply.id}">
+                                    <input type="hidden" name="forumName" th:value="${reply.getFormattedForum()}">
+                                    <input type="hidden" name="parentId" th:value="${reply.parentThreadId}">
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">Confirm</button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="modal fade" id="modal-delete">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        Delete Thread
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure want to delete this thread?
+                    </div>
+                    <form class="form-remove-grant" th:action="@{/forum/thread/delete}" method="post">
+                        <input type="hidden" name="threadId" th:value="${thread.id}">
+                        <input type="hidden" name="forumName" th:value="${thread.forumName}">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Confirm</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

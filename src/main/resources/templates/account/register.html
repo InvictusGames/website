@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{default}">
+<head>
+    <title>Account</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="row justify-content-center" th:if="${errorMessage != null}">
+        <div class="col-lg-5">
+            <div class="alert alert-danger" style="padding: 0.5rem 1rem; text-align: center;">
+                <p th:text="'Error: ' + ${errorMessage}"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-5">
+            <div class="card card-secondary">
+                <div class="card-header" style="text-align: center" th:text="${username}"></div>
+                <div class="card-body">
+                    <form th:action="@{'/register/' + ${token}}" method="post">
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" id="email" th:placeholder="${email}" th:value="${email}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                        </div>
+                        <input type="hidden" name="username" th:value="${username}">
+                        <input type="hidden" name="csrfmiddlewaretoken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-block">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

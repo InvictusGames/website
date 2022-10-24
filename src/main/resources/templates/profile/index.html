@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="@{default}"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Profile</title>
+</head>
+<body>
+<div class="wrapper">
+    <div layout:fragment="content">
+        <div class="row">
+            <div class="col-md-4 col-lg-3">
+                <div class="card card-profile-sidebar">
+                    <div th:class="'card-header ' + ${profile.online ? 'online' : 'offline'}"
+                         th:if="${!profile.hasPermission('invictus.staff') || (sessionProfile != null && sessionProfile.hasPermission('invictus.staff'))}">
+                        <span th:text="${profile.online ? 'Online' : 'Offline'}"></span>
+                        <div class="meta"
+                             th:text="${profile.online ? profile.getOnlineStatus() : profile.getOfflineStatus()}">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="profile-sidebar-avatar">
+                            <img th:src="'https://visage.surgeplay.com/bust/' + ${profile.uuid}"
+                                 th:alt="${profile.name}">
+                        </div>
+                        <div class="profile-sidebar-username" th:text="${profile.name}">
+                        </div>
+                    </div>
+                    <div class="card-footer" th:style="'--color: ' + ${profile.rank.webColor} + ';'"
+                         th:text="${profile.rank.getDisplayName()}">
+                    </div>
+                </div>
+
+                <div class="card card-secondary" th:if="${profile.getActiveSocials().size() >= 1}">
+                    <div class="card-body">
+                        <div class="data">
+                            <dl style="justify-content: center;">
+                                <a th:each="social : ${profile.getActiveSocials()}"
+                                   th:class="'fa fa-' + ${social.icon}" style="font-size:1.7em; margin: 0.5rem;"
+                                   th:href="${social.linkPrefix + profile.getSetting(social)}">
+                                </a>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-secondary">
+                    <div class="card-body">
+                        <div class="data">
+                            <dl>
+                                <dt>First Joined</dt>
+                                <dd th:text="${profile.getFirstJoined()}"></dd>
+                            </dl>
+                            <dl>
+                                <dt>Playtime</dt>
+                                <dd th:text="${profile.getPlaytime()}"></dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <!--<div class="card card-secondary">
+                    <div class="card-header">
+                        Friends
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center flex-wrap">
+
+                            <a href="/profile" class="m-1" title="Xemah" data-bs-toggle="tooltip">
+                                <img src="https://visage.surgeplay.com/face/X-Steve" alt="Xemah"
+                                     style="width: 32px; height: 32px; border-radius: 50%;">
+                            </a>
+
+                            <a href="/profile" class="m-1" title="Xemah" data-bs-toggle="tooltip">
+                                <img src="https://visage.surgeplay.com/face/X-Steve" alt="Xemah"
+                                     style="width: 32px; height: 32px; border-radius: 50%;">
+                            </a>
+
+                            <a href="/profile" class="m-1" title="Xemah" data-bs-toggle="tooltip">
+                                <img src="https://visage.surgeplay.com/face/X-Steve" alt="Xemah"
+                                     style="width: 32px; height: 32px; border-radius: 50%;">
+                            </a>
+
+                            <a href="/profile" class="m-1" title="Xemah" data-bs-toggle="tooltip">
+                                <img src="https://visage.surgeplay.com/face/X-Steve" alt="Xemah"
+                                     style="width: 32px; height: 32px; border-radius: 50%;">
+                            </a>
+
+                            <a href="/profile" class="m-1" title="Xemah" data-bs-toggle="tooltip">
+                                <img src="https://visage.surgeplay.com/face/X-Steve" alt="Xemah"
+                                     style="width: 32px; height: 32px; border-radius: 50%;">
+                            </a>
+
+                            <a href="/profile" class="m-1" title="Xemah" data-bs-toggle="tooltip">
+                                <img src="https://visage.surgeplay.com/face/X-Steve" alt="Xemah"
+                                     style="width: 32px; height: 32px; border-radius: 50%;">
+                            </a>
+
+                            <a href="/profile" class="m-1" title="Xemah" data-bs-toggle="tooltip">
+                                <img src="https://visage.surgeplay.com/face/X-Steve" alt="Xemah"
+                                     style="width: 32px; height: 32px; border-radius: 50%;">
+                            </a>
+
+                            <a href="/profile" class="m-1" title="Xemah" data-bs-toggle="tooltip">
+                                <img src="https://visage.surgeplay.com/face/X-Steve" alt="Xemah"
+                                     style="width: 32px; height: 32px; border-radius: 50%;">
+                            </a>
+
+                            <a href="/profile" class="m-1" title="Xemah" data-bs-toggle="tooltip">
+                                <img src="https://visage.surgeplay.com/face/X-Steve" alt="Xemah"
+                                     style="width: 32px; height: 32px; border-radius: 50%;">
+                            </a>
+
+                            <a href="/profile" class="m-1" title="Xemah" data-bs-toggle="tooltip">
+                                <img src="https://visage.surgeplay.com/face/X-Steve" alt="Xemah"
+                                     style="width: 32px; height: 32px; border-radius: 50%;">
+                            </a>
+
+                        </div>
+                    </div>
+                    <div class="card-footer" th:if="${sessionProfile != null && sessionProfile.uuid != profile.uuid}">
+                        <a href="#" class="btn btn-primary btn-sm btn-block">Add Friend</a>
+                    </div>
+                </div>-->
+            </div>
+            <div class="col-lg-9">
+
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a th:href="'/profile/' + ${profile.name}" class="nav-link"
+                           th:classappend="${page} == 'stats' ? 'active' : ''">General</a>
+                    </li>
+                    <li class="nav-item">
+                        <a th:href="'/profile/' + ${profile.name} + '/forums'" class="nav-link"
+                           th:classappend="${page} == 'forums' ? 'active' : ''">Forums</a>
+                    </li>
+                    <li class="nav-item"
+                        th:if='${sessionProfile != null && sessionProfile.hasPermission("invictus.command.grants")}'>
+                        <a th:href="'/profile/' + ${profile.name} + '/grants'" class="nav-link"
+                           th:classappend="${page} == 'grants' ? 'active' : ''">Grants</a>
+                    </li>
+                    <li class="nav-item"
+                        th:if='${sessionProfile != null && sessionProfile.hasPermission("invictus.command.history")}'>
+                        <a th:href="'/profile/' + ${profile.name} + '/punishments'" class="nav-link"
+                           th:classappend="${page} == 'punishments' ? 'active' : ''">Punishments</a>
+                    </li>
+                    <li class="nav-item"
+                        th:if='${sessionProfile != null && sessionProfile.hasPermission("website.ticket.viewall")}'>
+                        <a th:href="'/profile/' + ${profile.name} + '/tickets'" class="nav-link"
+                           th:classappend="${page} == 'tickets' ? 'active' : ''">Tickets</a>
+                    </li>
+                </ul>
+
+                <div th:replace="'profile/' + ${page} + '/index'"></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

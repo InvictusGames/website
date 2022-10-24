@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+</head>
+<body>
+<div th:fragment="stats">
+
+    <div class="row">
+
+        <div class="col-lg-12">
+            <div class="card card-secondary">
+                <div class="card-header" style="text-align:center">
+                    Current Trophies
+                </div>
+
+                <table class="table" th:if="${trophies.size >= 1}">
+                    <thead style="text-align:center">
+                    <tr>
+                        <th>Icon</th>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="trophy : ${trophies}" style="text-align:center">
+                        <td>
+                            <img th:src="${trophy.getImage()}">
+                        </td>
+                        <td>
+                            <span class="badge bg-success" th:text="${trophy.name}"></span>
+                        </td>
+                        <td>
+                            <a th:href="'#modal-' + ${trophy.id}" class="btn btn-danger btn-sm btn-sq" data-bs-toggle="modal">
+                                <i class="fa fa-trash fa-fw"></i>
+                            </a>
+                        </td>
+
+                        <div class="modal fade" th:id="'modal-' + ${trophy.id}">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        Remove Trophy
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure want to remove this trophy?
+                                    </div>
+
+                                    <form class="form-remove-grant" th:action="@{/admin/trophy/delete}" method="post">
+                                        <input type="hidden" name="trophyId" th:value="${trophy.id}">
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">Confirm</button>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="card-body">
+                    <div class="alert alert-danger" style="padding: 0.5rem 1rem; text-align: center;" th:if="${trophies.size() <= 0}">
+                        <p>There are no trophies.</p>
+                    </div>
+
+                    <button href="#modal-add-trophy" class="btn btn-primary" data-bs-toggle="modal">Add Trophy</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="modal-add-trophy">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Add Trophy
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form class="form-add-trophy" th:action="@{/admin/trophy/add}" method="post"
+                      enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="trophyName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="trophyName" name="trophyName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Image</label>
+                            <input type="file" id="file" name="file" accept="image/png" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="@{default}"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <title>New Thread</title>
+</head>
+
+<body>
+<div layout:fragment="content">
+
+    <div class="card">
+        <div class="card-header">
+            New Thread
+        </div>
+        <div class="card-body">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <form th:action="@{/forum/thread/new}" method="post">
+                        <div class="form-group">
+                            <label for="forumId" class="form-label">Forum</label>
+                            <select class="form-control" id="forumId" name="forumId">
+                                <option th:each="forum : ${forums}" th:text="${forum.name}" th:value="${forum.id}"
+                                        th:selected="${selected != null && selected == forum.id}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title">
+                        </div>
+                        <div class="form-group">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea type="text" class="form-control" id="content" name="content" rows="6"></textarea>
+                        </div>
+                        <input type="hidden" name="author" th:value="${sessionProfile.uuid}">
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

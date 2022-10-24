@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+</head>
+<body>
+<div th:fragment="punishments">
+
+    <div class="table-container table-responsive">
+        <table class="table">
+            <colgroup>
+                <col width="20%">
+                <col width="50%">
+                <col width="20%">
+                <col width="20%">
+            </colgroup>
+            <thead>
+            <tr>
+                <th style="text-align: center">Status</th>
+                <th>Ticket</th>
+                <th class="text-center">Replies</th>
+                <th>Last Reply</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr th:each="ticket : ${profileTickets}">
+                <td style="text-align: center">
+                        <span class="badge badge-success ticket-status"
+                              th:style="'background-color: ' + ${ticket.status.getWebColor()}"
+                              th:text="${ticket.status.getDisplayName()}"></span>
+                </td>
+                <td>
+                    <a th:href="'/ticket/' + ${ticket.id}">
+                        <strong th:text="${ticket.category.getDisplayName()} + ' #' + ${ticket.id}"></strong>
+                    </a>
+                    <div class="meta">
+                        <span>By </span>
+                        <a th:text="${ticket.authorName}" th:style="'color: ' + ${ticket.authorWebColor}" th:href="'/profile/' + ${ticket.authorName}"></a>
+                        <span>, </span>
+                        <span th:text="${ticket.getPostedAgo()}"></span>
+                    </div>
+                </td>
+                <td class="text-center" th:text="${ticket.replies.size()}">
+                </td>
+                <td th:if="${ticket.getLastReply() != null}">
+                    By <a th:href="'/profile/' + ${ticket.getLastReply().getAuthorName()}"
+                          th:style="'color: ' + ${ticket.getLastReply().getAuthorWebColor()}"
+                          th:text="${ticket.getLastReply().getAuthorName()}"></a>
+                    <div class="meta" th:text="${ticket.getLastReply().getPostedAgo()}">
+                    </div>
+                </td>
+                <td th:if="${ticket.getLastReply() == null}">
+                    <div class="meta" th:text="'Never'">
+                    </div>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <br>
+
+    <a class="change-page" th:if="${previousPage == currentPage}" href="#">&#8249;</a>
+    <a class="change-page" th:href="'/profile/' + ${profile.name} + '/tickets?page=' + ${previousPage}"
+       th:if="${previousPage != currentPage}" href="#">&#8249;</a>
+
+    <a class="change-page" th:if="${nextPage == currentPage}" href="#">&#8250;</a>
+    <a class="change-page" th:href="'/profile/' + ${profile.name} + '/tickets?page=' + ${nextPage}"
+       th:if="${nextPage != currentPage}" href="#">&#8250;</a>
+</div>
+</body>
+</html>

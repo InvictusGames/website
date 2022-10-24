@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+</head>
+<body>
+<div th:fragment="punishments">
+
+    <div class="table-container table-responsive">
+        <table class="table">
+            <colgroup>
+                <col>
+                <col width="15%">
+                <col width="25%">
+                <col width="14%">
+                <col width="16%">
+                <col>
+                <col>
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Status</th>
+                <th style="text-align: center">Type</th>
+                <th>Reason</th>
+                <th>Added By</th>
+                <th>Added At</th>
+                <th>Duration</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr th:each="punishment : ${profilePunishments}">
+                <td>
+                    <span th:class="'badge bg-' + ${punishment.isActive() ? 'success' : 'danger'}"
+                          th:text="${punishment.getStatus()}"></span>
+                </td>
+                <td style="text-align: center">
+                    <span class="badge" th:style="'background-color: ' + ${punishment.getColor()}"
+                          th:text="${punishment.punishmentType}"></span>
+                </td>
+                <td th:text="${punishment.punishedReason}"></td>
+                <td>
+                    <a th:href="'/profile/' + ${punishment.punishedBy}" class="link" th:text="${punishment.punishedBy}"></a>
+                </td>
+                <td th:text="${punishment.getAddedAt()}"></td>
+                <td th:text="${punishment.getExpiresAt()}"></td>
+                <td>
+                    <a th:if="${punishment.isActive()}" th:href="'#modal-' + ${punishment.id}"
+                       class="btn btn-danger btn-sm btn-sq" data-bs-toggle="modal">
+                        <i class="fa fa-trash fa-fw"></i>
+                    </a>
+                    <a th:if="${!punishment.isActive()}" href="#modal-punishmentCannotRemove"
+                       class="btn btn-danger btn-sm btn-sq" data-bs-toggle="modal">
+                        <i class="fa fa-trash fa-fw"></i>
+                    </a>
+                </td>
+
+                <div class="modal fade" th:id="'modal-' + ${punishment.id}">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                Remove Punishment
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body" style="padding: 0 1.25rem 0rem 1.25rem">
+                                Are you sure want to remove this punishment?
+                            </div>
+
+                            <form class="form-remove-punishment"
+                                  th:action="@{'/punishment/remove/' + ${profile.name} + '/' + ${punishment.id}}"
+                                  method="post">
+                                <div class="form-group" style="padding: 0 1.25rem 1.25rem">
+                                    <label for="reason" class="form-label">Reason</label>
+                                    <input type="text" class="form-control" name="reason" id="reason"
+                                           th:placeholder="${punishment.punishedReason}" required>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">Confirm</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <br>
+
+    <a class="change-page" th:if="${previousPage == currentPage}" href="#">&#8249;</a>
+    <a class="change-page" th:href="'/profile/' + ${profile.name} + '/punishments?page=' + ${previousPage}"
+       th:if="${previousPage != currentPage}" href="#">&#8249;</a>
+
+    <a class="change-page" th:if="${nextPage == currentPage}" href="#">&#8250;</a>
+    <a class="change-page" th:href="'/profile/' + ${profile.name} + '/punishments?page=' + ${nextPage}"
+       th:if="${nextPage != currentPage}" href="#">&#8250;</a>
+
+    <a href="#modal-punishmentAdd" style="position: sticky; left: 55%;" class="btn btn-primary" data-bs-toggle="modal">Add
+        Punishment</a>
+
+    <div class="modal fade" id="modal-punishmentAdd">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Add Punishment
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form class="form-add-punishment" th:action="@{'/punishment/add/' + ${profile.name}}" method="post">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="punishmentPlayer" class="form-label">Player</label>
+                            <input type="text" class="form-control" id="punishmentPlayer" name="punishmentPlayer"
+                                   th:value="${profile.name}" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="punishmentType" class="form-label">Punishment Type</label>
+                            <select class="form-control" id="punishmentType" name="punishmentType">
+                                <option th:each="type : ${allowedPunishmentTypes}" th:text="${type.getDisplayName()}" th:value="${type.name()}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="punishmentReason" class="form-label">Reason</label>
+                            <input type="text" class="form-control" id="punishmentReason" name="punishmentReason"
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <label for="punishmentDuration" class="form-label">Duration</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="punishmentDuration"
+                                       name="punishmentDuration" required>
+                                <select class="form-control" id="punishmentDurationType" name="punishmentDurationType">
+                                    <option value="days">Days</option>
+                                    <option value="hours">Hours</option>
+                                    <option value="minutes">Minutes</option>
+                                    <option value="forever">Forever</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-punishmentCannotRemove">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Cannot Remove Punishment
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    This punishment cannot be removed.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+</html>

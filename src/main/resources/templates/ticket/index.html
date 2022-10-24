@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="@{default}"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Ticket</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+
+        <div class="toolbar">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="/">
+                        <i class="fa fa-home"></i>
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="/tickets">
+                        Tickets
+                    </a>
+                </li>
+                <li class="breadcrumb-item" th:if="${sessionProfile != null && sessionProfile.hasPermission('website.ticket.viewall')}">
+                    <a href="/tickets/admin">Admin</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a th:text="${ticket.category.getDisplayName()}"></a>
+                </li>
+                <li class="breadcrumb-item active" th:text="'Ticket #' + ${ticket.id}">
+                </li>
+            </ol>
+            <div class="toolbar-buttons"
+                 th:if="${sessionProfile != null && sessionProfile.hasPermission('website.ticket.status.update')}">
+                <div class="dropdown">
+                    <a href="#" class="badge badge-success ticket-status dropdown-toggle" data-bs-toggle="dropdown"
+                       aria-expanded="false"
+                       th:style="'margin-top: 5px;font-size: 12px;line-height: 20px;min-width: 100px;background-color: ' + ${ticket.status.getWebColor()}"
+                       th:text="${ticket.status.getDisplayName()}"></a>
+
+                    <ul class="dropdown-menu dropdown-menu-end" style="text-align: center">
+                        <li>
+                            <a th:href="@{'/ticket/updateStatus/' + ${ticket.id} + '/resolved'}"
+                               class="badge badge-success ticket-status"
+                               style="min-width: 80%;background-color: #198754;font-size: 12px;">
+                                Resolved
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{'/ticket/updateStatus/' + ${ticket.id} + '/closed'}"
+                               class="badge badge-success ticket-status"
+                               style="min-width: 80%;background-color: #dc3545;font-size: 12px;">
+                                Closed
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card card-thread">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 d-none d-md-block">
+                        <div class="text-end">
+                            <img th:src="'https://visage.surgeplay.com/full/' + ${ticket.author}"
+                                 th:alt="${ticket.authorName}" style="width: 125px;">
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="card-header">
+                            <span th:text="${ticket.category.getDisplayName()} + ' #' + ${ticket.id}"></span>
+                            <span class="badge badge-success ticket-status"
+                                  th:style="'background-color: ' + ${ticket.status.getWebColor()}"
+                                  th:text="${ticket.status.getDisplayName()}"></span>
+                            <div class="meta">
+                                By <a th:href="'/profile/' + ${ticket.authorName}" th:text="${ticket.authorName}"
+                                      th:style="'color: ' + ${ticket.authorWebColor}"></a>,
+                                <span th:text="${ticket.getPostedAgo()}"></span>
+                            </div>
+                        </div>
+                        <div class="content" th:utext="${ticket.getContent()}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                Replies
+            </div>
+            <div class="card-body">
+
+                <div class="message"
+                     th:if="${!ticket.isClosed() || sessionProfile.hasPermission('website.ticket.status.update')}">
+                    <div class="message-icon">
+                        <img th:src="'https://visage.surgeplay.com/face/' + ${sessionProfile.uuid}"
+                             th:alt="${sessionProfile.name}">
+                    </div>
+                    <div class="message-content">
+                        <form th:action="@{/ticket/reply}" method="post">
+                            <div class="input-group">
+                                <input type="hidden" name="ticketAuthor" id="ticketAuthor" th:value="${ticket.author}">
+                                <input type="hidden" name="ticketId" id="ticketId" th:value="${ticket.id}">
+
+                                <input type="text" class="form-control" name="content" id="content"
+                                       style="border-radius: 5px 0px 0px 5px" placeholder="Type your reply here...">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-share"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="message" th:each="reply : ${ticket.replies}">
+                    <div class="message-icon">
+                        <a th:href="'/profile/' + ${reply.authorName}">
+                            <img th:src="'https://visage.surgeplay.com/face/' + ${reply.author}"
+                                 th:alt="${reply.authorName}">
+                        </a>
+                    </div>
+                    <div class="message-content">
+                        <div class="meta">
+                            <a th:href="'/profile/' + ${reply.authorName}" th:text="${reply.authorName}"
+                               th:style="'color: ' + ${reply.authorWebColor}"></a>,
+                            <span th:text="${reply.getPostedAgo()}"></span>
+                        </div>
+                        <div class="content" th:text="${reply.body}">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="modal fade" id="modal-delete">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        Delete Thread
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure want to delete this thread?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

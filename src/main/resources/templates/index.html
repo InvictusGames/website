@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="@{default}" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Home</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row">
+
+        <div class="col-lg-8">
+            <div class="card card-news" th:each="thread : ${threads}">
+                <div class="card-header">
+                    <div class="card-header-icon">
+                        <img th:src="'https://crafatar.com/avatars/' + ${thread.author} + '/?overlay'" th:alt="${thread.authorName}">
+                    </div>
+                    <div class="card-header-content">
+                        <a th:href="'/forum/announcements/' + ${thread.id}" th:text="${thread.title}"></a>
+                        <div class="meta">
+                            By <a th:href="'/profile/' + ${thread.authorName}" th:text="${thread.authorName}" th:style="'color: ' + ${thread.authorWebColor}"></a>,
+                            <span th:text="${thread.getPostedAgo()}"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="content">
+                        <p th:utext="${thread.getContent()}">
+                        </p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="'/forum/announcements/' + ${thread.id}" class="btn btn-primary btn-sm btn-block">Read More</a>
+                </div>
+            </div>
+        </div>
+
+        <iframe src="https://discord.com/widget?id=947630260684476416&amp;theme=dark" class="col-lg-4"
+                width="350" height="500" allowtransparency="true" frameborder="0"
+                sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+    </div>
+</div>
+
+</body>
+</html>

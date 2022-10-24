@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE">Brave</title>
+
+    <meta name="author" content="Xemah">
+    <meta name="theme-color" content="#FFD740">
+    <meta name="description" content="">
+    <meta property="og:title" th:content="${bannerTitle} + ' | Brave'">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:image" th:content="@{/images/logo.png}">
+    <meta property="og:description" content="">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+</head>
+<body id="page-index">
+<div class="wrapper">
+    <header class="header">
+        <div class="metabar">
+            <div class="container" th:if="${session.uuid == null}">
+                <ul class="metabar-nav ms-auto">
+                    <li class="metabar-item">
+                        <a href="/register" class="metabar-link">Register</a>
+                    </li>
+                    <li class="metabar-item">
+                        <a href="/login" class="metabar-link">Login</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="container" th:if="${sessionProfile != null}">
+                <ul class="metabar-nav ms-auto">
+                    <div class="head-div" style="text-align: right">
+                        <a class="metabar-nav-link" th:href="'/profile/' + ${sessionProfile.name}"
+                           style="transform: translate(0px, 6px);display: block;text-align: right;color: #6188b0;text-transform: uppercase;font-weight: 700;font-size: 6px; letter-spacing: .3px;">
+                            Logged in as
+                        </a>
+                        <a class="metabar-nav-link" th:href="'/profile/' + ${sessionProfile.name}"
+                           style="font-size: 12px;font-weight: 560;" th:text="${sessionProfile.name}">
+                        </a>
+                    </div>
+
+                    <div class="dropdown" style="cursor: pointer">
+                        <img style="border-radius: 5px" data-bs-toggle="dropdown"
+                             th:src="'https://crafatar.com/avatars/' + ${sessionProfile.uuid} + '?size=22&amp;overlay'">
+
+                        <ul class="dropdown-menu dropdown-menu-end" style="padding: 0rem 0rem">
+
+                            <li style="padding: 0rem">
+                                <a th:href="'/profile/' + ${sessionProfile.name}" class="dropdown-item">
+                                    <span class="fa fa-user" style="font-size: 13px; margin-right: 5px;"></span>
+                                    <span>View Profile</span>
+                                </a>
+                            </li>
+                            <li style="padding: 0rem">
+                                <a href="/settings" class="dropdown-item">
+                                    <span class="fa fa-cogs" style="font-size: 13px; margin-right: 5px;"></span>
+                                    <span>Settings</span>
+                                </a>
+                            </li>
+                            <li style="padding: 0rem" th:if="${sessionProfile.hasPermission('website.admin.view')}">
+                                <a href="/admin" class="dropdown-item">
+                                    <span class="fa fa-wrench" style="font-size: 13px; margin-right: 5px;"></span>
+                                    <span>Admin</span>
+                                </a>
+                            </li>
+                            <li style="padding: 0rem">
+                                <a th:href="'/logout'" class="dropdown-item">
+                                    <span class="fa fa-sign-out" style="font-size: 13px; margin-right: 5px;"></span>
+                                    <span>Logout</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+
+                </ul>
+            </div>
+        </div>
+        <nav class="navbar navbar-expand">
+            <div class="container">
+                <a href="/" class="navbar-brand">
+                    <img th:src="@{/images/logo.png}" alt="Brave">
+                </a>
+                <ul class="navbar-nav d-none d-md-flex">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/forums" class="nav-link">Forums</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/staff" class="nav-link">Staff</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/tickets" class="nav-link">Support</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/store" class="nav-link" style="color: var(--color-primary)">Store</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown" id="dropdown-playerSearch">
+                        <input type="text" class="form-control form-control-sm" id="input-playerSearch"
+                               placeholder="Search..." data-bs-toggle="dropdown">
+                        <ul class="dropdown-menu"></ul>
+                    </li>
+                    <li class="nav-item dropdown d-md-none">
+                        <a href="#" class="nav-link dropdown-toggle no-caret" data-bs-toggle="dropdown">
+                            <i class="fa fa-bars"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a href="/" class="dropdown-item">Home</a>
+                            </li>
+                            <li>
+                                <a href="/forums" class="dropdown-item">Forums</a>
+                            </li>
+                            <li>
+                                <a href="/staff" class="dropdown-item">Staff</a>
+                            </li>
+                            <li>
+                                <a href="/tickets" class="dropdown-item">Support</a>
+                            </li>
+                            <li>
+                                <a href="/store" class="dropdown-item" style="var(--color-primary)">Store</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="header-banner header-banner-big">
+            <div class="container">
+
+                <div class="header-banner-heading" th:if="@{bannerTitle != null}">
+                    <h1 th:text="${bannerTitle}"></h1>
+                </div>
+                <div class="header-banner-description" th:if="@{bannerDescription != null}">
+                    <p th:text="${bannerDescription}"></p>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div layout:fragment="content"></div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-icon">
+                <img th:src="@{/images/logo.png}" alt="Brave">
+            </div>
+            <div class="footer-content">
+                <div class="footer-copyright">
+                    Copyright &copy; <a href="/">Brave</a> 2022.
+                </div>
+                <div class="footer-credits">
+                    Designed with &hearts; by <a href="https://xemah.com">Xemah</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>
